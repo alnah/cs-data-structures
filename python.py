@@ -10,74 +10,80 @@ class Node(Generic[T]):
         self.next: Node[T] | None = None
 
     def __repr__(self) -> str:
-        return str(self.value)
+        current = self.value
+        next = None if self.next is None else self.next.value
+        return f"Node(current={current}, next={next})"
 
 
 class LinkedList(Generic[T]):
     def __init__(self) -> None:
         self.head: Node[T] | None = None
         self.tail: Node[T] | None = None
-        self.__size = 0
+        self.size: int = 0
 
     def __iter__(self) -> Generator[Node[T], None, None]:
         node = self.head
-        while node:
+        while node is not None:
             yield node
             node = node.next
 
     def __repr__(self) -> str:
-        return " -> ".join([str(node.value) for node in self])
-
-    def __increment(self) -> None:
-        self.__size += 1
-
-    def __decrement(self) -> None:
-        self.__size -= 1
+        values = []
+        for node in self:
+            values.append(str(node.value))
+        return " -> ".join(values) if values else "Empty Linked List"
 
     def is_empty(self) -> bool:
-        return self.__size == 0
-
-    def size(self) -> int:
-        return self.__size
+        return self.size == 0
 
     def append_head(self, value: T) -> None:
         node = Node(value)
         if self.is_empty():
             self.head, self.tail = node, node
-        elif self.head:
-            node.next = self.head
-            self.head = node
-        self.__increment()
+
+        elif self.head is not None:
+            previous_head, new_head = self.head, node
+            new_head.next = previous_head
+            self.head = new_head
+
+        self.size += 1
 
     def append_tail(self, value: T) -> None:
         node = Node(value)
         node.next = None
         if self.is_empty():
             self.head, self.tail = node, node
-        elif self.tail:
-            self.tail.next = node
-            self.tail = node
-        self.__increment()
+
+        if self.tail is not None:
+            previous_tail, new_tail = self.tail, node
+            previous_tail.next = new_tail
+            self.tail = new_tail
+
+        self.size += 1
 
     def remove_head(self) -> T | None:
-        temp = None
+        previous_head = None
         if self.is_empty():
-            return None
-        elif self.head:
-            temp = self.head.value
-            self.head = self.head.next
-        if not self.head:
-            self.tail = None
-        self.__decrement()
-        return temp
+            return previous_head
+
+        if self.head is not None:
+            previous_head = self.head
+            new_head = self.head.next
+            self.head = new_head
+            if self.head is None:
+                self.tail = None
+
+            self.size -= 1
+            return previous_head.value
 
 
 class Stack(Generic[T]):
     def __init__(self) -> None:
-        self.ll = LinkedList()
+        self.ll = LinkedList[T]()
+        self.size = self.ll.size
 
-    def __repr__(self) -> str:
-        return repr(self.ll)
+    def __repr__(self):
+        return repr(self.ll) if not self.ll.is_empty() else "Empty Stack"
 
     def is_empty(self) -> bool:
         return self.ll.is_empty()
@@ -89,18 +95,19 @@ class Stack(Generic[T]):
         return self.ll.remove_head()
 
     def peek(self) -> T | None:
-        return None if not self.ll.head else self.ll.head.value
-
-    def size(self) -> int:
-        return self.ll.size()
+        return self.ll.head.value if self.ll.head is not None else None
 
 
 class Queue(Generic[T]):
     def __init__(self) -> None:
-        self.ll = LinkedList()
+        self.ll = LinkedList[T]()
+        self.size = self.ll.size
 
     def __repr__(self) -> str:
-        return " <- ".join([node.value for node in self.ll])
+        values = []
+        for node in self.ll:
+            values.append(str(node.value))
+        return " <- ".join(values) if values else "Empty Queue"
 
     def is_empty(self) -> bool:
         return self.ll.is_empty()
@@ -111,8 +118,11 @@ class Queue(Generic[T]):
     def dequeue(self) -> T | None:
         return self.ll.remove_head()
 
-    def size(self) -> int:
-        return self.ll.size()
+    def first(self) -> T | None:
+        return self.ll.head.value if self.ll.head is not None else None
+
+    def last(self) -> T | None:
+        return self.ll.tail.value if self.ll.tail is not None else None
 
 
 def is_balanced(input_str: str) -> bool:
@@ -131,7 +141,7 @@ def is_balanced(input_str: str) -> bool:
         else:
             return False
 
-    if stack.size() > 1:
+    if stack.size > 1:
         return False
 
     return True
@@ -139,6 +149,7 @@ def is_balanced(input_str: str) -> bool:
 
 def main():
     pass
+
 
 if __name__ == "__main__":
     main()
