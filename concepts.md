@@ -62,26 +62,55 @@ Queues are often used for:
 
 # Binary Search Tree - BSTNode
 
-Trees are kind of like linked lists in the sense that the root node simply holds references to its child nodes, which in turn hold references to their children.
+Trees are data structures where each node contains a value and holds references to its child nodes. In a generic tree:
 
-A generic tree structure has the following rules:
+- Each node has a value and a list of children
+- Every child node has exactly one parent
 
-- Each node has a value and a list of "children"
-- Children can only have a single "parent"
+A binary search tree (BST) is a special type of tree where each node has at most two children, and it adheres to the following rules:
 
-Binary search tree characteristics:
+- Each node can have at most two children, typically called the left and right child
+- The value of the left child must be less than its parent's value
+- The value of the right child must be greater than its parent's value
+- No two nodes in the BST have the same value
 
-- Instead of an unbounded list of children, each node has at most 2 children
-- The left child's value must be less than its parent's value
-- The right child's value must be greater than its parent's value
-- No two nodes in the BST can have the same value
+BST methods should have a complexity of O(log(n)) for lookups, deletions and insertions.
 
-Predecessor:
+## Naming convention
 
-Successor:
+### Predecessor
 
-Preorder traversal:
+Node with the next lower value.
 
-Postorder traversal:
+- If the node has a left subtree, the predecessor is the maximum value node within that left subtree.
+- If there is no left subtree, the predecessor is typically found by moving up the tree to find an ancestor node whose value is less than the current node's value.
 
-Inorder traversal:
+### Successor
+
+Node with the next higher value.
+
+- If the node has a right subtree, the successor is the minimum value node in that right subtree.
+- If there is no right subtree, the successor is determined by traversing up the tree to locate an ancestor whose value is greater than the current node's value.
+
+### Tree Traversals
+
+Methods for visiting all the nodes in a tree in a specific order.
+
+#### Preorder
+
+Visit the root first, then traverse the left subtree, and finally the right subtree.
+
+- ex. For creating a copy of the tree.
+- ex. To get a prefix expression on an expression tree.
+
+#### Postorder
+
+Traverse the left subtree first, then the right subtree, and visit the root node last.
+
+- ex. For deleting trees (freeing memory) or evaluating postfix expressions.
+
+#### Inorder
+
+Traverse the left subtree first, visit the root, and then traverse the right subtree.
+
+- ex. For printing the tree's contents in order.
