@@ -1,4 +1,4 @@
-from typing import Generator, Generic, TypeVar
+from typing import Generator, Generic, Optional, TypeVar
 
 
 T = TypeVar("T")
@@ -145,6 +145,186 @@ def is_balanced(input_str: str) -> bool:
         return False
 
     return True
+
+
+class User:
+    def __init__(self, id: int, username: str) -> None:
+        self.id = id
+        self.username = username
+
+    def __eq__(self, other: object) -> bool:
+        return isinstance(other, User) and self.id == other.id
+
+    def __lt__(self, other: object) -> bool:
+        return isinstance(other, User) and self.id < other.id
+
+    def __gt__(self, other: object) -> bool:
+        return isinstance(other, User) and self.id > other.id
+
+    def __repr__(self) -> str:
+        return f'User(id={self.id}, username="{self.username}")'
+
+
+class BSTNode:
+    def __init__(self, value: User | None = None) -> None:
+        self.value = value
+        self.left: BSTNode | None = None
+        self.right: BSTNode | None = None
+
+    def min(self) -> User | None:
+        if self.value is None:
+            return None
+
+        current = self
+        while current.left:
+            current = current.left
+        return current.value
+
+    def max(self) -> User | None:
+        if self.value is None:
+            return None
+
+        current = self
+        while current.right:
+            current = current.right
+        return current.value
+
+    def preorder_traversal(self, visited: list[User] | None = None) -> list[User]:
+        if visited is None:
+            visited = []
+
+        if self.value:
+            visited.append(self.value)
+
+        if self.left:
+            self.left.preorder_traversal(visited)
+
+        if self.right:
+            self.right.preorder_traversal(visited)
+
+        return visited
+
+    def postorder_traversal(self, visited: list[User] | None = None) -> list[User]:
+        if visited is None:
+            visited = []
+
+        if self.left:
+            self.left.postorder_traversal(visited)
+
+        if self.right:
+            self.right.postorder_traversal(visited)
+
+        if self.value:
+            visited.append(self.value)
+
+        return visited
+
+    def inorder_traversal(self, visited: list[User] | None = None) -> list[User]:
+        if visited is None:
+            visited = []
+
+        if self.left:
+            self.left.inorder_traversal(visited)
+
+        if self.value:
+            visited.append(self.value)
+
+        if self.right:
+            self.right.inorder_traversal(visited)
+
+        return visited
+
+    def exists(self, value: User) -> bool:
+        found = False
+
+        if value == self.value:
+            found = True
+
+        if value < self.value and self.left:
+            found = self.left.exists(value)
+
+        if value > self.value and self.right:
+            found = self.right.exists(value)
+
+        return found
+
+    def insert(self, value: User) -> None:
+        if self.value is None:
+            self.value = value
+            return
+
+        if value < self.value:
+            if not self.left:
+                self.left = BSTNode(value)
+                return
+            self.left.insert(value)
+
+        if value > self.value:
+            if not self.right:
+                self.right = BSTNode(value)
+                return
+            self.right.insert(value)
+
+        return
+
+    def delete(self, value: User) -> Optional["BSTNode"]:
+        """https://datastructureguru.quora.com/How-to-delete-node-from-binary-search-tree"""
+        # Node already deleted
+        if self.value is None:
+            return None
+
+        if value < self.value:
+            if self.left:
+                self.left = self.left.delete(value)
+            return self
+
+        if value > self.value:
+            if self.right:
+                self.right = self.right.delete(value)
+            return self
+
+        # Node found with one child
+        if not self.left:
+            return self.right
+
+        if not self.right:
+            return self.left
+
+        # Node found with two children:
+        # - Replace the current node value with the successor node value
+        # - Delete the successor node value recursively
+        successor = self.right
+        while successor.left:
+            successor = successor.left
+        assert successor.value
+        self.value = successor.value
+        self.right = self.right.delete(successor.value)
+        return self
+
+    def search_range(self, lower_bound: User, upper_bound: User) -> list[User]:
+        visited = []
+
+        if self.left and self.value > lower_bound:
+            visited.extend(self.left.search_range(lower_bound, upper_bound))
+
+        visited.append(self.value)
+
+        if self.right and self.value < upper_bound:
+            visited.extend(self.right.search_range(lower_bound, upper_bound))
+
+        return visited
+
+    def depth(self) -> int:
+        if self.value is None:
+            return 0
+
+        left_height, right_height = 0, 0
+        if self.left:
+            left_height = self.left.depth()
+        if self.right:
+            right_height = self.right.depth()
+
+        return max(left_height, right_height) + 1
 
 
 def main():

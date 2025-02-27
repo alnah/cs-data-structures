@@ -59,3 +59,29 @@ Queues are often used for:
 - Email and message processing
 - Caching and memory manamgent
 - Real-time data processing
+
+# Binary Search Tree - BSTNode
+
+Trees are kind of like linked lists in the sense that the root node simply holds references to its child nodes, which in turn hold references to their children.
+
+A generic tree structure has the following rules:
+
+- Each node has a value and a list of "children"
+- Children can only have a single "parent"
+
+Binary search tree characteristics:
+
+- Instead of an unbounded list of children, each node has at most 2 children
+- The left child's value must be less than its parent's value
+- The right child's value must be greater than its parent's value
+- No two nodes in the BST can have the same value
+
+Predecessor:
+
+Successor:
+
+Preorder traversal:
+
+Postorder traversal:
+
+Inorder traversal:
