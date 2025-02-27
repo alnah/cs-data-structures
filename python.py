@@ -327,6 +327,157 @@ class BSTNode:
         return max(left_height, right_height) + 1
 
 
+class RBNode:
+    def __init__(self, value: User | None) -> None:
+        self.red: bool = False
+        self.parent: RBNode | None = None
+        self.val: Optional[User] = value
+        self.left: RBNode | None = None
+        self.right: RBNode | None = None
+
+    def __repr__(self) -> str:
+        color = "R" if self.red else "B"
+        return f"RBNode({self.val}, {color})"
+
+
+class RBTree:
+    def __init__(self) -> None:
+        # The nil sentinel node represents leaves.
+        self.nil: RBNode = RBNode(None)
+        self.nil.red = False
+        # For convenience, set both children of nil to itself.
+        self.nil.left = self.nil
+        self.nil.right = self.nil
+        self.root: RBNode = self.nil
+
+    def insert(self, value: User) -> None:
+        new_node: RBNode = RBNode(value)
+        new_node.parent = None
+        new_node.left = self.nil
+        new_node.right = self.nil
+        new_node.red = True  # new nodes are inserted red
+
+        parent: RBNode | None = None
+        current: RBNode = self.root
+
+        while current != self.nil:
+            parent = current
+            # Since we never insert a nil value, it's safe to assert current.val is not None.
+            if new_node.val is not None and current.val is not None:
+                if new_node.val < current.val:
+                    current = current.left  # type: ignore
+                elif new_node.val > current.val:
+                    current = current.right  # type: ignore
+                else:
+                    # Duplicate value; do nothing.
+                    return
+            else:
+                break
+
+        new_node.parent = parent
+        if parent is None:
+            # Tree was empty
+            self.root = new_node
+        elif new_node.val is not None and parent.val is not None:
+            if new_node.val < parent.val:
+                parent.left = new_node
+            elif new_node.val > parent.val:
+                parent.right = new_node
+
+        self.fix_insert(new_node)
+
+    def fix_insert(self, new_node: RBNode) -> None:
+        while (
+            new_node != self.root
+            and new_node.parent is not None
+            and new_node.parent.red
+        ):
+            parent = new_node.parent
+            grandparent = parent.parent
+            if grandparent is None:
+                break
+            if parent == grandparent.right:
+                uncle: RBNode = grandparent.left  # type: ignore
+                if uncle.red:
+                    # Case 1: Uncle is red.
+                    uncle.red = False
+                    parent.red = False
+                    grandparent.red = True
+                    new_node = grandparent
+                else:
+                    # Case 2 & 3: Uncle is black.
+                    if new_node == parent.left:
+                        new_node = parent
+                        self.rotate_right(new_node)
+                    parent.red = False
+                    grandparent.red = True
+                    self.rotate_left(grandparent)
+            else:
+                # Symmetric to the above
+                uncle: RBNode = grandparent.right  # type: ignore
+                if uncle.red:
+                    uncle.red = False
+                    parent.red = False
+                    grandparent.red = True
+                    new_node = grandparent
+                else:
+                    if new_node == parent.right:
+                        new_node = parent
+                        self.rotate_left(new_node)
+                    parent.red = False
+                    grandparent.red = True
+                    self.rotate_right(grandparent)
+        self.root.red = False
+
+    def exists(self, value: User) -> RBNode:
+        current: RBNode = self.root
+        while current != self.nil and current.val is not None and current.val != value:
+            if value < current.val:
+                current = current.left  # type: ignore
+            else:
+                current = current.right  # type: ignore
+        return current
+
+    def rotate_left(self, pivot_parent: RBNode) -> None:
+        # Ensure that the right child exists (i.e. is not the nil sentinel)
+        if pivot_parent == self.nil or pivot_parent.right == self.nil:
+            return
+
+        pivot: RBNode = pivot_parent.right  # type: ignore
+        pivot_parent.right = pivot.left
+        if pivot.left != self.nil:
+            pivot.left.parent = pivot_parent  # type: ignore
+
+        pivot.parent = pivot_parent.parent
+        if pivot_parent.parent is None:
+            self.root = pivot
+        elif pivot_parent == pivot_parent.parent.left:
+            pivot_parent.parent.left = pivot
+        else:
+            pivot_parent.parent.right = pivot
+        pivot.left = pivot_parent
+        pivot_parent.parent = pivot
+
+    def rotate_right(self, pivot_parent: RBNode) -> None:
+        if pivot_parent == self.nil or pivot_parent.left == self.nil:
+            return
+
+        pivot: RBNode = pivot_parent.left  # type: ignore
+        pivot_parent.left = pivot.right
+        if pivot.right != self.nil:
+            pivot.right.parent = pivot_parent  # type: ignore
+
+        pivot.parent = pivot_parent.parent
+        if pivot_parent.parent is None:
+            self.root = pivot
+        elif pivot_parent == pivot_parent.parent.right:
+            pivot_parent.parent.right = pivot
+        else:
+            pivot_parent.parent.left = pivot
+        pivot.right = pivot_parent
+        pivot_parent.parent = pivot
+
+
 def main():
     pass
 

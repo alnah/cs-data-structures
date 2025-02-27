@@ -75,6 +75,7 @@ A binary search tree (BST) is a special type of tree where each node has at most
 - No two nodes in the BST have the same value
 
 BST methods should have a complexity of O(log(n)) for lookups, deletions and insertions.
+However, if the tree is unbalanced due to partially, or worst, totally sorted data, BST methods will have a O(n) complexity equal to their depth.
 
 ## Naming convention
 
@@ -114,3 +115,17 @@ Traverse the left subtree first, then the right subtree, and visit the root node
 Traverse the left subtree first, visit the root, and then traverse the right subtree.
 
 - ex. For printing the tree's contents in order.
+
+# Red-Black Tree - RBTree and RBNode
+
+A red-black tree is a kind of binary search tree that solves the "balancing" problem.
+It contains a bit of extra logic to ensure that as nodes are inserted and deleted, the tree remains relatively balanced.
+
+- Each node is either red or black
+- The root is black
+- All nil leaf nodes are black
+- If a node is red, then both its children are black
+- All paths from a single node go through the same number of black nodes to reach any of its descendant nil nodes
+
+The re-balancing of a red-black tree does not result in a perfectly balanced tree.
+However, its insertion and deletion operations, along with the tree rearrangement and recoloring, are always performed in O(log(n)) time.
