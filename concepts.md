@@ -129,3 +129,14 @@ It contains a bit of extra logic to ensure that as nodes are inserted and delete
 
 The re-balancing of a red-black tree does not result in a perfectly balanced tree.
 However, its insertion and deletion operations, along with the tree rearrangement and recoloring, are always performed in O(log(n)) time.
+
+# Hashmap
+
+A hash map (or hash table) is a data structure that maps keys to values, offering very fast average-case performance for lookups, insertions, and deletions—typically O(1).
+Hash maps use an array to store key-value pairs.
+Each key is mapped to an index in the array via a hash function.
+
+- The hash function processes the key (e.g., by combining the Unicode values of its characters) to produce a numerical hash value. This hash value is then converted to an array index (often using the modulus operator). For example, a simple hash function that sums Unicode values might produce the same result for "ab" and "ba", hence requiring collision handling.
+- Since different keys can hash to the same index, hash maps must handle collisions. If a collision occurs, the algorithm searches sequentially through the array to find an empty slot.
+- When a hash map becomes too full, its performance degrades due to increased collisions. To address this, hash maps are resized—typically by allocating a larger array (often double the current size) and rehashing all existing elements. Although resizing is an O(n) operation, it happens infrequently enough that the amortized cost per operation remains O(1).
+- Iterating over a hash map involves traversing the underlying array. This operation is O(n) because every bucket in the array must be examined, even if many buckets are empty.

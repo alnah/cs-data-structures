@@ -331,7 +331,7 @@ class RBNode:
     def __init__(self, value: User | None) -> None:
         self.red: bool = False
         self.parent: RBNode | None = None
-        self.val: Optional[User] = value
+        self.val: User | None = value
         self.left: RBNode | None = None
         self.right: RBNode | None = None
 
@@ -348,7 +348,7 @@ class RBTree:
         # For convenience, set both children of nil to itself.
         self.nil.left = self.nil
         self.nil.right = self.nil
-        self.root: RBNode = self.nil
+        self.root = self.nil
 
     def insert(self, value: User) -> None:
         new_node: RBNode = RBNode(value)
@@ -476,6 +476,88 @@ class RBTree:
             pivot_parent.parent.left = pivot
         pivot.right = pivot_parent
         pivot_parent.parent = pivot
+
+
+K = TypeVar("K", bound=str)  # keys are strings for our custom hash function
+V = TypeVar("V")
+
+
+class HashMap(Generic[K, V]):
+    def __init__(self, size: int = 8) -> None:
+        self.MULTIPLIER = 31
+        self.LOAD_THRESHOLD = 0.7
+        self.RESIZE_FACTOR = 2
+        self.hashmap: list[tuple[K, V] | None] = [None] * size
+
+    def key_to_index(self, key: K) -> int:
+        hash_value = 0
+        for c in key:
+            hash_value = hash_value * self.MULTIPLIER + ord(c)
+
+        return hash_value % len(self.hashmap)
+
+    def current_load(self) -> float:
+        filled = 0
+        for item in self.hashmap:
+            if item is not None:
+                filled += 1
+
+        return filled / len(self.hashmap)
+
+    def resize(self) -> None:
+        old_hashmap = self.hashmap
+        new_size = len(old_hashmap) * self.RESIZE_FACTOR
+        self.hashmap = [None] * new_size
+
+        for pair in old_hashmap:
+            if pair is not None:
+                key, value = pair
+                self._insert_no_resize(key, value)
+
+    def _insert_no_resize(self, key: K, value: V) -> None:
+        index = self.key_to_index(key)
+        start_index = index
+
+        while self.hashmap[index] is not None:
+            pair = self.hashmap[index]
+            assert pair is not None
+            if pair[0] == key:
+                self.hashmap[index] = (key, value)
+                return
+
+            index = (index + 1) % len(self.hashmap)
+            if index == start_index:
+                raise Exception("Hashmap is full")
+
+        self.hashmap[index] = (key, value)
+
+    def insert(self, key: K, value: V) -> None:
+        if self.current_load() > self.LOAD_THRESHOLD:
+            self.resize()
+
+        self._insert_no_resize(key, value)
+
+    def get(self, key: K) -> V:
+        index = self.key_to_index(key)
+        start_index = index
+
+        while self.hashmap[index] is not None:
+            pair = self.hashmap[index]
+            assert pair is not None
+            current_key, current_value = pair
+            if current_key == key:
+                return current_value
+
+            index = (index + 1) % len(self.hashmap)
+            if index == start_index:
+                break
+
+        raise KeyError("Key not found")
+
+    def __repr__(self) -> str:
+        return "\n".join(
+            f"Index {i}: {v}" for i, v in enumerate(self.hashmap) if v is not None
+        )
 
 
 def main():
