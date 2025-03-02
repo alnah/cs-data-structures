@@ -1,4 +1,4 @@
-from typing import Generator, Generic, Optional, TypeVar
+from typing import Generator, Generic, Optional, TypeVar, Union
 
 
 T = TypeVar("T")
@@ -558,6 +558,102 @@ class HashMap(Generic[K, V]):
         return "\n".join(
             f"Index {i}: {v}" for i, v in enumerate(self.hashmap) if v is not None
         )
+
+
+TrieNode = dict[str, Union["TrieNode", bool]]
+
+
+class Trie:
+    def __init__(self) -> None:
+        self.root: TrieNode = {}
+        self.end_symbol: str = "*"
+
+    def add(self, word: str) -> None:
+        level: TrieNode = self.root
+        for char in word:
+            if char not in level:
+                level[char] = {}
+            level = level[char]  # type: ignore
+
+        level[self.end_symbol] = True
+
+    def exists(self, word: str) -> bool:
+        level: TrieNode = self.root
+        for char in word:
+            if char not in level:
+                return False
+            level = level[char]  # type: ignore
+
+        return self.end_symbol in level
+
+    def search_level(
+        self, current_level: TrieNode, current_prefix: str, words: list[str]
+    ) -> list[str]:
+        if self.end_symbol in current_level:
+            words.append(current_prefix)
+
+        for letter in sorted(current_level.keys()):
+            if letter != self.end_symbol:
+                self.search_level(current_level[letter], current_prefix + letter, words)  # type: ignore
+
+        return words
+
+    def words_with_prefix(self, prefix: str) -> list[str]:
+        collected_words: list[str] = []
+        level: TrieNode = self.root
+        for letter in prefix:
+            if letter not in level:
+                return []
+            level = level[letter]  # type: ignore
+
+        return self.search_level(level, prefix, collected_words)
+
+    def find_matches(self, document: str) -> set[str]:
+        collected_words: set[str] = set()
+        document_length: int = len(document)
+        for i in range(document_length):
+            level: TrieNode = self.root
+            for j in range(i, document_length):
+                char = document[j]
+                if char not in level:
+                    break
+                level = level[char]  # type: ignore
+                if self.end_symbol in level:
+                    collected_words.add(document[i : j + 1])
+
+        return collected_words
+
+    def advanced_find_matches(
+        self, document: str, variations: dict[str, str]
+    ) -> set[str]:
+        collected_words: set[str] = set()
+        document_length: int = len(document)
+        for i in range(document_length):
+            level: TrieNode = self.root
+            for j in range(i, document_length):
+                char = document[j]
+                if char in variations:
+                    char = variations[char]
+                if char not in level:
+                    break
+                level = level[char]  # type: ignore
+                if self.end_symbol in level:
+                    collected_words.add(document[i : j + 1])
+
+        return collected_words
+
+    def longest_common_prefix(self) -> str:
+        level: TrieNode = self.root
+        prefix: str = ""
+        while True:
+            keys = list(level.keys())
+            if self.end_symbol in keys or len(keys) != 1:
+                break
+            char = keys[0]
+            prefix += char
+            level = level[char]  # type: ignore
+
+        return prefix
 
 
 def main():

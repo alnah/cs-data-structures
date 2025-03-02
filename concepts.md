@@ -140,3 +140,12 @@ Each key is mapped to an index in the array via a hash function.
 - Since different keys can hash to the same index, hash maps must handle collisions. If a collision occurs, the algorithm searches sequentially through the array to find an empty slot.
 - When a hash map becomes too full, its performance degrades due to increased collisions. To address this, hash maps are resized—typically by allocating a larger array (often double the current size) and rehashing all existing elements. Although resizing is an O(n) operation, it happens infrequently enough that the amortized cost per operation remains O(1).
 - Iterating over a hash map involves traversing the underlying array. This operation is O(n) because every bucket in the array must be examined, even if many buckets are empty.
+
+# Tries
+
+A trie is a nested tree of hashmaps where each key is a character that maps to the next character in a word.
+It is also often referred to as a "prefix tree" because it can be used to efficiently find all of the words that start with a given prefix.
+
+- The `*` character is used to indicate the end of a word: autcomplete, keyword search, spellcheck, etc.
+- Tries tend to be most useful for prefix matching, while hashmaps are only good for exact matchs.
+- Find matches method is O(n \* m) at best, and O(n^2) at worst.
