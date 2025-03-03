@@ -1,4 +1,4 @@
-from typing import Generator, Generic, Optional, TypeVar, Union
+from typing import Protocol, Any, Generator, Generic, Optional, TypeVar, Union
 
 
 T = TypeVar("T")
@@ -560,16 +560,16 @@ class HashMap(Generic[K, V]):
         )
 
 
-TrieNode = dict[str, Union["TrieNode", bool]]
+TNode = dict[str, Union["TNode", bool]]
 
 
 class Trie:
     def __init__(self) -> None:
-        self.root: TrieNode = {}
+        self.root: TNode = {}
         self.end_symbol: str = "*"
 
     def add(self, word: str) -> None:
-        level: TrieNode = self.root
+        level: TNode = self.root
         for char in word:
             if char not in level:
                 level[char] = {}
@@ -578,7 +578,7 @@ class Trie:
         level[self.end_symbol] = True
 
     def exists(self, word: str) -> bool:
-        level: TrieNode = self.root
+        level: TNode = self.root
         for char in word:
             if char not in level:
                 return False
@@ -587,7 +587,7 @@ class Trie:
         return self.end_symbol in level
 
     def search_level(
-        self, current_level: TrieNode, current_prefix: str, words: list[str]
+        self, current_level: TNode, current_prefix: str, words: list[str]
     ) -> list[str]:
         if self.end_symbol in current_level:
             words.append(current_prefix)
@@ -600,7 +600,7 @@ class Trie:
 
     def words_with_prefix(self, prefix: str) -> list[str]:
         collected_words: list[str] = []
-        level: TrieNode = self.root
+        level: TNode = self.root
         for letter in prefix:
             if letter not in level:
                 return []
@@ -612,7 +612,7 @@ class Trie:
         collected_words: set[str] = set()
         document_length: int = len(document)
         for i in range(document_length):
-            level: TrieNode = self.root
+            level: TNode = self.root
             for j in range(i, document_length):
                 char = document[j]
                 if char not in level:
@@ -629,7 +629,7 @@ class Trie:
         collected_words: set[str] = set()
         document_length: int = len(document)
         for i in range(document_length):
-            level: TrieNode = self.root
+            level: TNode = self.root
             for j in range(i, document_length):
                 char = document[j]
                 if char in variations:
@@ -643,7 +643,7 @@ class Trie:
         return collected_words
 
     def longest_common_prefix(self) -> str:
-        level: TrieNode = self.root
+        level: TNode = self.root
         prefix: str = ""
         while True:
             keys = list(level.keys())
@@ -654,6 +654,41 @@ class Trie:
             level = level[char]  # type: ignore
 
         return prefix
+
+
+class Orderable(Protocol):
+    def __lt__(self, other: Any) -> bool: ...
+
+
+U = TypeVar("U", bound=Orderable)
+
+
+class Graph(Generic[U]):
+    def __init__(self) -> None:
+        self.graph: dict[U, set[U]] = {}
+
+    def add_node(self, u: U) -> None:
+        if u not in self.graph:
+            self.graph[u] = set()
+
+    def add_edge(self, u: U, v: U) -> None:
+        if neighbors := self.graph.get(u):
+            neighbors.add(v)
+        else:
+            self.graph[u] = {v}
+        if neighbors := self.graph.get(v):
+            neighbors.add(u)
+        else:
+            self.graph[v] = {u}
+
+    def edge_exists(self, u: U, v: U) -> bool:
+        return u in self.graph and v in self.graph[u] and u in self.graph[v]
+
+    def adjacent_nodes(self, node: U) -> list[U]:
+        return sorted(self.graph.get(node, []))
+
+    def unconnected_vertices(self) -> list[U]:
+        return [node for node, neighbors in self.graph.items() if not neighbors]
 
 
 def main():
