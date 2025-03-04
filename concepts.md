@@ -149,3 +149,33 @@ It is also often referred to as a "prefix tree" because it can be used to effici
 - The `*` character is used to indicate the end of a word: autcomplete, keyword search, spellcheck, etc.
 - Tries tend to be most useful for prefix matching, while hashmaps are only good for exact matchs.
 - Find matches method is O(n \* m) at best, and O(n^2) at worst.
+
+# Graph, Breadth First Search, and Depth First Search
+
+A graph is a set of vertices and the edges that connect those vertices.
+All trees are graphs, but not all graphs are trees.
+
+- Graphs can have any number of vertices
+- An undirected graph can have up to `n(n - 1)/2` edges for `n` vertices
+- Vertices can exist without edges but may be disconnected (and thus kinda useless
+- Typically graphs (with the exception of multigraphs) can only have a single edge between two vertice
+
+## Complete Graph
+
+A complete graph is a graph where every pair of vertices is connected by an edge.
+
+## Breadth First Search - BFS
+
+Breadth-first search (BFS) is an algorithm for traversing or searching tree or graph data structures.
+It starts at a root (some arbitrary node on a graph), and explores all of the neighbor nodes at the present depth before going on to the nodes at the next depth level.
+
+## Depth First Search - DFS
+
+Depth-first search (DFS) is just another algorithm to traverse a graph - kind of like breadth first search.
+It starts at a root node (some arbitrary node on the graph) and explores as far as possible along each branch before backtracking and starting down the next branch.
+
+## Which one to use?
+
+- **BFS** if the solution is close to the root node in tree-based graph (faster).
+- **BFS** if a search space of infinite depth (DFS impossible).
+- **DFS** if it's a wide graph like, a tree of 10 vertices, and each one has 10 vertices, and so on (efficient, consume memory).

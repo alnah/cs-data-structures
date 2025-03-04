@@ -690,6 +690,60 @@ class Graph(Generic[U]):
     def unconnected_vertices(self) -> list[U]:
         return [node for node, neighbors in self.graph.items() if not neighbors]
 
+    def breadth_first_search(self, start: U) -> list[U]:
+        visited = []
+        visited_set = {start}
+        q = Queue[U]()
+        q.enqueue(start)
+        while not q.is_empty():
+            node = q.dequeue()
+            if node is None:
+                continue
+            visited.append(node)
+            for neighbor in self.adjacent_nodes(node):
+                if neighbor not in visited_set:
+                    visited_set.add(neighbor)
+                    q.enqueue(neighbor)
+        return visited
+
+    def depth_first_search(self, start: U) -> list[U]:
+        visited = []
+        visited_set = {start}
+        stack = [start]
+        while stack:
+            node = stack.pop()
+            visited.append(node)
+
+            for neighbor in reversed(self.adjacent_nodes(node)):
+                if neighbor not in visited_set:
+                    visited_set.add(neighbor)
+                    stack.append(neighbor)
+        return visited
+
+    def bfs_path(self, start: U, end: U) -> Optional[list[U]]:
+        if start == end:
+            return [start]
+        parent: dict[U, Optional[U]] = {start: None}
+        visited_set = {start}
+        q = Queue[U]()
+        q.enqueue(start)
+        while not q.is_empty():
+            current = q.dequeue()
+            if current is None:
+                continue
+            if current == end:
+                path = []
+                while current is not None:
+                    path.append(current)
+                    current = parent[current]
+                return path[::-1]
+            for neighbor in self.adjacent_nodes(current):
+                if neighbor not in visited_set:
+                    visited_set.add(neighbor)
+                    parent[neighbor] = current
+                    q.enqueue(neighbor)
+        return None
+
 
 def main():
     pass
